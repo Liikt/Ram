@@ -22,7 +22,7 @@ func main() {
 	utils.CheckError(err, "Error creating Discord session: ", err)
 
 	dg.AddHandler(cb.Ready)
-	dg.AddHandler(cb.OnMention)
+	dg.AddHandler(cb.OnMessage)
 
 	err = dg.Open()
 	utils.CheckError(err, "Error opening Discord session: ", err)
