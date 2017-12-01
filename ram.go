@@ -40,7 +40,6 @@ func ready(s *discordgo.Session, event *discordgo.Ready) {
 
 	for _, channel := range channels {
 		go func(c *discordgo.Channel) {
-			fmt.Println(c.Name)
 			if c.Name == "dumb-bot-shit" {
 				_, _ = s.ChannelMessageSend(c.ID, "I HAVE RETURNED WITH MORE CANCER")
 			}
