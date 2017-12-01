@@ -1,6 +1,9 @@
 package callbacks
 
-import "github.com/bwmarrin/discordgo"
+import (
+	utils "../Ram/utils"
+	"github.com/bwmarrin/discordgo"
+)
 
 func onMention(s *discordgo.Session, m *discordgo.MessageCreate) {
 	if m.Author.ID == s.State.User.ID || m.Author.Bot {
