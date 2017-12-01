@@ -21,8 +21,8 @@ func main() {
 	dg, err := discordgo.New("Bot " + utils.Key)
 	utils.CheckError(err, "Error creating Discord session: ", err)
 
-	dg.AddHandler(cb.ready)
-	dg.AddHandler(cb.onMention)
+	dg.AddHandler(cb.Ready)
+	dg.AddHandler(cb.OnMention)
 
 	err = dg.Open()
 	utils.CheckError(err, "Error opening Discord session: ", err)

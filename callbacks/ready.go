@@ -1,11 +1,11 @@
 package callbacks
 
 import (
-	utils "../Ram/utils"
+	utils "../utils"
 	"github.com/bwmarrin/discordgo"
 )
 
-func ready(s *discordgo.Session, event *discordgo.Ready) {
+func Ready(s *discordgo.Session, event *discordgo.Ready) {
 	s.UpdateStatus(0, "CANCER")
 	channels, err := s.GuildChannels("258726617361285131")
 	utils.CheckError(err, "Couldn't get the Server with the ID: ", "283066637928890379")
