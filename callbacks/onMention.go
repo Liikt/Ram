@@ -13,6 +13,10 @@ func OnMessage(s *discordgo.Session, m *discordgo.MessageCreate) {
 		return
 	}
 
+	if m.ChannelID == "276583899088289793" {
+		s.MessageReactionAdd(m.ChannelID, m.Message.ID, "🐀")
+	}
+
 	if utils.MentionsContainsUser(m.Mentions, s.State.User) {
 		c, err := s.State.Channel(m.ChannelID)
 		utils.CheckError(err, "Couldn't get the Channel with the ID: ", m.ChannelID)
