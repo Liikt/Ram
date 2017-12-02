@@ -2,9 +2,11 @@ package main
 
 import (
 	"fmt"
+	"math/rand"
 	"os"
 	"os/signal"
 	"syscall"
+	"time"
 
 	cb "../Ram/callbacks"
 	utils "../Ram/utils"
@@ -12,7 +14,7 @@ import (
 )
 
 func main() {
-
+	rand.Seed(time.Now().UnixNano())
 	if utils.Key == "" {
 		fmt.Println("No token provided. Please run: airhorn -t <bot token>")
 		return
