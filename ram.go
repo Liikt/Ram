@@ -16,7 +16,7 @@ import (
 func main() {
 	rand.Seed(time.Now().UnixNano())
 	if utils.Key == "" {
-		fmt.Println("No token provided. Please run: airhorn -t <bot token>")
+		fmt.Println("No key provided. Please add 'var Key string = <key>' to utils/secret.go")
 		return
 	}
 
