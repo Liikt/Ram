@@ -16,7 +16,7 @@ func CheckError(e error, msg ...interface{}) {
 	}
 }
 
-func MentionsContainsUser(arr []*discordgo.User, el *discordgo.User) bool {
+func ArrayContainsUser(arr []*discordgo.User, el *discordgo.User) bool {
 	if len(arr) == 0 {
 		return false
 	}

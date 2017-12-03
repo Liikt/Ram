@@ -19,7 +19,7 @@ func OnMessage(s *discordgo.Session, m *discordgo.MessageCreate) {
 
 	f.Shitpost(s, m)
 
-	if utils.MentionsContainsUser(m.Mentions, s.State.User) {
+	if utils.ArrayContainsUser(m.Mentions, s.State.User) {
 		c, err := s.State.Channel(m.ChannelID)
 		utils.CheckError(err, "Couldn't get the Channel with the ID: ", m.ChannelID)
 
@@ -36,6 +36,8 @@ func OnMessage(s *discordgo.Session, m *discordgo.MessageCreate) {
 		switch command {
 		case "echo":
 			f.Echo(s, m, line)
+		case "record":
+			f.Record(s, m)
 		default:
 			go s.ChannelMessageSend(m.ChannelID, "I AM LIVING CANCER")
 		}
