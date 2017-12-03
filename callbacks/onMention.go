@@ -1,6 +1,8 @@
 package callbacks
 
 import (
+	"strings"
+
 	f "../functions"
 	utils "../utils"
 	"github.com/bwmarrin/discordgo"
@@ -24,13 +26,18 @@ func OnMessage(s *discordgo.Session, m *discordgo.MessageCreate) {
 		_, err = s.State.Guild(c.GuildID)
 		utils.CheckError(err, "Couldn't get the Server with the ID: ", c.GuildID)
 
-		// split := strings.SplitN(m.ContentWithMentionsReplaced(), " ", 3)
-		// command, line := split[1], ""
+		split := strings.SplitN(m.ContentWithMentionsReplaced(), " ", 3)
+		command, line := split[1], ""
 
-		// if len(split) == 3 {
-		// 	line = split[2]
-		// }
+		if len(split) == 3 {
+			line = split[2]
+		}
 
-		// command = line
+		switch command {
+		case "echo":
+			f.Echo(s, m, line)
+		default:
+			go s.ChannelMessageSend(m.ChannelID, "I AM LIVING CANCER")
+		}
 	}
 }
