@@ -2,7 +2,6 @@ package functions
 
 import (
 	"encoding/binary"
-	"fmt"
 	"os"
 	"os/exec"
 	"regexp"
@@ -52,7 +51,6 @@ func Record(s *discordgo.Session, m *discordgo.MessageCreate, filename string, c
 	}
 
 	channelToJoin := getCurrentVoiceChannel(s, m.Author, guild)
-	fmt.Println(channelToJoin.Name, channelToJoin.Recipients)
 
 	if match, _ := regexp.Match("^[A-Za-z0-9._]+$", []byte(filename)); filename == "" || !match {
 		filename = time.Now().Format("2006-02-Jan")
@@ -82,7 +80,6 @@ func Record(s *discordgo.Session, m *discordgo.MessageCreate, filename string, c
 		for {
 			select {
 			case <-closeChan:
-				fmt.Println("Closing")
 				mutex.Lock()
 				for _, packet := range packetArr {
 					binary.Write(f, binary.LittleEndian, packet)
@@ -98,7 +95,6 @@ func Record(s *discordgo.Session, m *discordgo.MessageCreate, filename string, c
 
 			case <-time.After(1 * time.Second):
 				if len(packetArr) > 0 {
-					fmt.Println("Writing to file")
 					go func() {
 						mutex.Lock()
 						tmp := packetArr
