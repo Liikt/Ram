@@ -46,7 +46,7 @@ func OnMessage(s *discordgo.Session, m *discordgo.MessageCreate) {
 			recording = false
 		case "record":
 			if !recording && (m.Author.Username == "Endmonaut" || m.Author.Username == "Liikt") {
-				f.Record(s, m, line, closeChannel)
+				go f.Record(s, m, line, closeChannel)
 				recording = true
 			} else {
 				s.ChannelMessageSend(m.ChannelID, "I CURRENTLY AM RECORDING YOU FUCK")
