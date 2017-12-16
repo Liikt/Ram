@@ -8,7 +8,10 @@ import (
 	"github.com/bwmarrin/discordgo"
 )
 
-var closeChannel = make(chan bool)
+var (
+	closeChannel = make(chan bool)
+	recording    = false
+)
 
 func OnMessage(s *discordgo.Session, m *discordgo.MessageCreate) {
 	if m.Author.ID == s.State.User.ID || m.Author.Bot {
@@ -40,8 +43,14 @@ func OnMessage(s *discordgo.Session, m *discordgo.MessageCreate) {
 			f.Echo(s, m, line)
 		case "stoprecord":
 			closeChannel <- true
+			recording = false
 		case "record":
-			f.Record(s, m, line, closeChannel)
+			if !recording && (m.Author.Username == "Endmonaut" || m.Author.Username == "Liikt") {
+				f.Record(s, m, line, closeChannel)
+				recording = true
+			} else {
+				s.ChannelMessageSend(m.ChannelID, "I CURRENTLY AM RECORDING YOU FUCK")
+			}
 		case "debug":
 			f.Debug(s, m)
 		default:
