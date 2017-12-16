@@ -1,7 +1,6 @@
 package callbacks
 
 import (
-	"fmt"
 	"strings"
 
 	f "../functions"
@@ -9,7 +8,7 @@ import (
 	"github.com/bwmarrin/discordgo"
 )
 
-var closeChannel chan bool
+var closeChannel = make(chan bool)
 
 func OnMessage(s *discordgo.Session, m *discordgo.MessageCreate) {
 	if m.Author.ID == s.State.User.ID || m.Author.Bot {
@@ -36,15 +35,13 @@ func OnMessage(s *discordgo.Session, m *discordgo.MessageCreate) {
 			line = split[2]
 		}
 
-		fmt.Println(command)
-
 		switch command {
 		case "echo":
 			f.Echo(s, m, line)
 		case "stoprecord":
 			closeChannel <- true
 		case "record":
-			f.Record(s, m, closeChannel)
+			f.Record(s, m, line, closeChannel)
 		case "debug":
 			f.Debug(s, m)
 		default:

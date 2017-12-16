@@ -4,6 +4,7 @@ import (
 	"encoding/binary"
 	"fmt"
 	"os"
+	"strings"
 	"sync"
 	"time"
 
@@ -28,9 +29,7 @@ func getCurrentVoiceChannel(s *discordgo.Session, user *discordgo.User, guild *d
 	return nil
 }
 
-func Record(s *discordgo.Session, m *discordgo.MessageCreate, close chan bool) {
-	fileName := "Testfile.pcm"
-
+func Record(s *discordgo.Session, m *discordgo.MessageCreate, filename string, closeChan chan bool) {
 	channel, _ := s.State.Channel(m.ChannelID)
 	if channel == nil {
 		log.WithFields(log.Fields{
@@ -51,28 +50,45 @@ func Record(s *discordgo.Session, m *discordgo.MessageCreate, close chan bool) {
 	}
 
 	channelToJoin := getCurrentVoiceChannel(s, m.Author, guild)
+	fmt.Println(channelToJoin.Name, channelToJoin.Recipients)
+
+	if filename == "" {
+		filename = time.Now().Format("2006-01-02")
+	}
+	if !strings.HasSuffix(filename, ".pcm") {
+		filename += ".pcm"
+	}
 
 	if channelToJoin == nil {
 		log.Warning("Couldn't find the channel to join")
 		s.ChannelMessageSend(m.ChannelID, "Couldn't find the channel to join")
 	} else {
+		mutex := &sync.Mutex{}
+		packetArr := [][]int16{}
 		voice, err := s.ChannelVoiceJoin(channelToJoin.GuildID, channelToJoin.ID, true, false)
 		utils.CheckError(err, "Couldn't join the voice channel")
 		defer voice.Disconnect()
 
-		f, _ := os.OpenFile(fileName, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
+		f, _ := os.OpenFile(filename, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
 		defer f.Close()
-
-		mutex := &sync.Mutex{}
-		packetArr := [][]int16{}
 
 		recv := make(chan *discordgo.Packet, 2)
 		go dgvoice.ReceivePCM(voice, recv)
 
 		for {
 			select {
+			case <-closeChan:
+				fmt.Println("Closing")
+				mutex.Lock()
+				for _, packet := range packetArr {
+					binary.Write(f, binary.LittleEndian, packet)
+				}
+				mutex.Unlock()
+				return
+
 			case packet, _ := <-recv:
 				packetArr = append(packetArr, packet.PCM)
+
 			case <-time.After(1 * time.Second):
 				if len(packetArr) > 0 {
 					fmt.Println("Writing to file")
@@ -86,9 +102,6 @@ func Record(s *discordgo.Session, m *discordgo.MessageCreate, close chan bool) {
 						mutex.Unlock()
 					}()
 				}
-			case <-close:
-				fmt.Println("Closing")
-				return
 			}
 		}
 	}
