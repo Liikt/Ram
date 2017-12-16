@@ -4,9 +4,8 @@ import (
 	"io/ioutil"
 	"log"
 
-	yaml "gopkg.in/yaml.v2"
-
 	"github.com/bwmarrin/discordgo"
+	yaml "gopkg.in/yaml.v2"
 )
 
 func CheckError(e error, msg ...interface{}) {
