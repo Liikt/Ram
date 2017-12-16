@@ -4,6 +4,7 @@ import (
 	"encoding/binary"
 	"fmt"
 	"os"
+	"regexp"
 	"strings"
 	"sync"
 	"time"
@@ -52,12 +53,14 @@ func Record(s *discordgo.Session, m *discordgo.MessageCreate, filename string, c
 	channelToJoin := getCurrentVoiceChannel(s, m.Author, guild)
 	fmt.Println(channelToJoin.Name, channelToJoin.Recipients)
 
-	if filename == "" {
-		filename = time.Now().Format("2006-01-02")
+	if match, _ := !regexp.Match("^[A-Za-z0-9._]+$", filename); filename == "" || !match {
+		filename = time.Now().Format("2006-02-Jan")
 	}
 	if !strings.HasSuffix(filename, ".pcm") {
 		filename += ".pcm"
 	}
+
+	filename = "recordings/" + filename
 
 	if channelToJoin == nil {
 		log.Warning("Couldn't find the channel to join")
