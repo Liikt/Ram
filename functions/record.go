@@ -72,7 +72,6 @@ func Record(s *discordgo.Session, m *discordgo.MessageCreate, close chan bool) {
 		for {
 			select {
 			case packet, _ := <-recv:
-				fmt.Println("SSRC:", packet.SSRC, "Sequence:", packet.Sequence, "Timestamp", packet.Timestamp, "Type:", packet.Type, "Opus:", packet.Opus, "PCM:", packet.PCM)
 				packetArr = append(packetArr, packet.PCM)
 			case <-time.After(1 * time.Second):
 				if len(packetArr) > 0 {
