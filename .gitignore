@@ -1,1 +1,7 @@
 *secret*
+*sublime*
+*.raw
+*.pcm
+*.wav
+*debug.go
+*.txt
