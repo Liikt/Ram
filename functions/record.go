@@ -4,6 +4,7 @@ import (
 	"encoding/binary"
 	"fmt"
 	"os"
+	"os/exec"
 	"regexp"
 	"strings"
 	"sync"
@@ -53,7 +54,7 @@ func Record(s *discordgo.Session, m *discordgo.MessageCreate, filename string, c
 	channelToJoin := getCurrentVoiceChannel(s, m.Author, guild)
 	fmt.Println(channelToJoin.Name, channelToJoin.Recipients)
 
-	if match, _ := !regexp.Match("^[A-Za-z0-9._]+$", filename); filename == "" || !match {
+	if match, _ := regexp.Match("^[A-Za-z0-9._]+$", []byte(filename)); filename == "" || !match {
 		filename = time.Now().Format("2006-02-Jan")
 	}
 	if !strings.HasSuffix(filename, ".pcm") {
@@ -87,6 +88,9 @@ func Record(s *discordgo.Session, m *discordgo.MessageCreate, filename string, c
 					binary.Write(f, binary.LittleEndian, packet)
 				}
 				mutex.Unlock()
+				args := []string{"-f", "s16le", "-ar", "44.1k", "-ac", "2", "-i", filename, strings.TrimSuffix(filename, ".pcm") + ".wav"}
+				cmd := exec.Command("ffmpeg", args...)
+				cmd.Start()
 				return
 
 			case packet, _ := <-recv:
