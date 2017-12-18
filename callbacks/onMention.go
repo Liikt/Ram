@@ -9,8 +9,8 @@ import (
 )
 
 var (
-	closeChannel = make(chan bool)
-	recording    = false
+	commChan  = make(chan string)
+	recording = false
 )
 
 func OnMessage(s *discordgo.Session, m *discordgo.MessageCreate) {
@@ -41,16 +41,20 @@ func OnMessage(s *discordgo.Session, m *discordgo.MessageCreate) {
 		switch command {
 		case "echo":
 			f.Echo(s, m, line)
-		case "stoprecord":
-			closeChannel <- true
-			recording = false
 		case "record":
 			if !recording && (m.Author.Username == "Endmonaut" || m.Author.Username == "Liikt") {
-				go f.Record(s, m, line, closeChannel)
+				go f.Record(s, m, line, commChan)
 				recording = true
 			} else {
 				s.ChannelMessageSend(m.ChannelID, "I CURRENTLY AM RECORDING YOU FUCK")
 			}
+		case "pause":
+			commChan <- "pause"
+		case "resume":
+			commChan <- "resume"
+		case "stop":
+			commChan <- "stop"
+			recording = false
 		case "debug":
 			f.Debug(s, m)
 		default:

@@ -30,7 +30,17 @@ func getCurrentVoiceChannel(s *discordgo.Session, user *discordgo.User, guild *d
 	return nil
 }
 
-func Record(s *discordgo.Session, m *discordgo.MessageCreate, filename string, closeChan chan bool) {
+func writePacketToFile(f *os.File, mutex *sync.Mutex, packetArr [][]int16) {
+	mutex.Lock()
+	for _, packet := range packetArr {
+		binary.Write(f, binary.LittleEndian, packet)
+	}
+	mutex.Unlock()
+}
+
+func Record(s *discordgo.Session, m *discordgo.MessageCreate, filename string, commChan chan string) {
+	recording := true
+
 	channel, _ := s.State.Channel(m.ChannelID)
 	if channel == nil {
 		log.WithFields(log.Fields{
@@ -79,31 +89,29 @@ func Record(s *discordgo.Session, m *discordgo.MessageCreate, filename string, c
 
 		for {
 			select {
-			case <-closeChan:
-				mutex.Lock()
-				for _, packet := range packetArr {
-					binary.Write(f, binary.LittleEndian, packet)
+			case comm := <-commChan:
+				switch comm {
+				case "pause":
+					recording = false
+				case "resume":
+					recording = true
+				case "stop":
+					writePacketToFile(f, mutex, packetArr)
+					cmd := exec.Command("./recordings.sh")
+					cmd.Start()
+					return
+				default:
 				}
-				mutex.Unlock()
-				args := []string{"-f", "s16le", "-ar", "44.1k", "-ac", "2", "-i", filename, strings.TrimSuffix(filename, ".pcm") + ".wav"}
-				cmd := exec.Command("ffmpeg", args...)
-				cmd.Start()
-				return
 
 			case packet, _ := <-recv:
-				packetArr = append(packetArr, packet.PCM)
+				if recording {
+					packetArr = append(packetArr, packet.PCM)
+				}
 
 			case <-time.After(1 * time.Second):
 				if len(packetArr) > 0 {
-					go func() {
-						mutex.Lock()
-						tmp := packetArr
-						packetArr = [][]int16{}
-						for _, packet := range tmp {
-							binary.Write(f, binary.LittleEndian, packet)
-						}
-						mutex.Unlock()
-					}()
+					go writePacketToFile(f, mutex, packetArr)
+					packetArr = [][]int16{}
 				}
 			}
 		}
