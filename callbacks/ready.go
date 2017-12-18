@@ -1,6 +1,9 @@
 package callbacks
 
-import "github.com/bwmarrin/discordgo"
+import (
+	utils "../utils"
+	"github.com/bwmarrin/discordgo"
+)
 
 func Ready(s *discordgo.Session, event *discordgo.Ready) {
 	s.UpdateStatus(0, "CANCER")
