@@ -32,6 +32,8 @@ func handleNormal(embed reactionalShitpost, s *discordgo.Session, m *discordgo.M
 	s.ChannelMessageSend(m.ChannelID, embed.reaction)
 }
 
+// Shitpost handles the shitposting of the bot. Whenever a received message contains a key of the
+// `shitMap` the bot will send the corresponding shitpost
 func Shitpost(s *discordgo.Session, m *discordgo.MessageCreate) {
 	shitMap = map[string]interface{}{
 		"woah":                embeddedShitpost{0xEB8D43, "http://i0.kym-cdn.com/photos/images/newsfeed/001/279/920/054.png", "WOAH"},

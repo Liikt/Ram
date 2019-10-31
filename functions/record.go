@@ -38,6 +38,7 @@ func writePacketToFile(f *os.File, mutex *sync.Mutex, packetArr [][]int16) {
 	mutex.Unlock()
 }
 
+// Record will record what ever is happening in a voice chat.
 func Record(s *discordgo.Session, m *discordgo.MessageCreate, filename string, commChan chan string) {
 	recording := true
 

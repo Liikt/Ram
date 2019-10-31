@@ -13,6 +13,7 @@ var (
 	recording = false
 )
 
+// OnMessage will be executed every time the discord session will receive a message
 func OnMessage(s *discordgo.Session, m *discordgo.MessageCreate) {
 	if m.Author.ID == s.State.User.ID || m.Author.Bot {
 		return
