@@ -6,3 +6,4 @@
 *debug.go
 *.txt
 recording/*
+.vscode
